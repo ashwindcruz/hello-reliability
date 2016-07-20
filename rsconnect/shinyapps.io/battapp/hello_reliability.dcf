@@ -1,0 +1,10 @@
+name: hello_reliability
+account: battapp
+server: shinyapps.io
+appId: 115630
+bundleId: 510056
+url: https://battapp.shinyapps.io/hello_reliability/
+when: 1469005673.45292
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: bad sample.csv|basicMaths.R|good sample.csv
