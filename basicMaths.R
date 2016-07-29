@@ -1,7 +1,7 @@
 library('MASS')
 
 #Randomly generate 100 numbers assuming a normal distribution of mean 50 and std dev 100
-class <- rnorm(100, 50, 10)
+ class <- rnorm(100, 50, 10)
 
 #Fit a Gaussian to our class. It should be very close to mean 50 and std dev 10
 classFit <- fitdistr(class, "normal")

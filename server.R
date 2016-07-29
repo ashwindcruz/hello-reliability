@@ -17,24 +17,71 @@ shinyServer(function(input, output) {
     if (is.null(inFile))
       return(NULL)
     
-    classSet <- rnorm(100, 50, 10)
+    popMean <- 50
+    popRangeMean <- 40
     
+    #Set the upper and lower limits
+    lsl <- 40
+    usl <- 60
+    
+    #Read in the new sample
     inputData <- read.csv(inFile$datapath)
-    values <- inputData[,2]
-    holder <- t.test(classSet,values)
+    newSample <- inputData[,2]
     
-    if(holder[[3]]<0.05){
-      output$bad<-renderText({"Sample is significantly different"})
-      output$good<-renderText({""})
+    #Calculate the stats associated with the new sample
+    sampleMean <- mean(newSample)
+    sampleSize <- length(newSample)
+    sampleRange <- diff(range(newSample))
+    stDevOptions <- c(NaN,1.128,1.693,2.059,2.326,2.534,2.704,2.847,2.970,3.078)
+    sampleStDev <- stDevOptions[sampleSize]    
+                      
+    #Update the population stats
+    popMean <- (popMean + sampleMean)/2
+    popRangeMean <- (popRangeMean + sampleRange)/2
+    
+    #Calculate the process capability indices
+    cpl <- (popMean - lsl)/(3 * sampleStDev)
+    cul <- (usl - popMean)/(3 * sampleStDev)
+    cpk <- min(cpl,cul)
+    
+    print("popMean")
+    print(popMean)
+    print("lsl")
+    print(lsl)
+    print("usl")
+    print(usl)
+    
+    print("sampleMean")
+    print(sampleMean)
+    print("sampleStDev")
+    print(sampleStDev)
+    
+    #Tell the user if defective material is being made or not
+    if(cpk<1){
+      displayMessage <- paste("Your process capability is",cpk,"so defective materials are being made",sep = " ")
+      output$bad <- renderText({displayMessage})
+      output$good <- renderText({""})
     }
     else{
-      output$bad<-renderText({""})
-      output$good<-renderText({"Sample is not significantly different"})
+      displayMessage <- paste("Your process capability value is",cpk,"so defective materials are not being made",sep = " ")
+      output$good <- renderText({displayMessage})
+      output$bad <- renderText({""})
     }
     
-    roundedPValue <- round(holder[[3]],digits = 4)
+    #Calculate the defective material percentage
+    upperArea <- pnorm(usl, mean = sampleMean, sampleStDev, lower.tail = FALSE, log.p = FALSE)
+    lowerArea <- pnorm(lsl, mean = sampleMean, sampleStDev, lower.tail = TRUE, log.p = FALSE)
+    totalAreaPercentage <- (upperArea + lowerArea) * 100
     
-    result <- paste("p Value", roundedPValue, sep = " ")
+    defPercentageMessage <- paste("The probability of obtaining a defective item:", totalAreaPercentage,"%",sep = " ")
+    output$defPercentage <- renderText({defPercentageMessage})
+    
+    contentsMessage <- ""
+               
+               
+    #use p norm
+    #for usl, lower tail false
+    #for lsl, lower tail true
     
   })
   

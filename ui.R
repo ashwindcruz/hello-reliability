@@ -25,7 +25,8 @@ shinyUI(fluidPage(
       p(span(HTML("&alpha;"))," Value: 0.05"),
       textOutput('contents'),
       div(textOutput('good'),style="color:green"),
-      div(textOutput('bad'),style="color:red")
+      div(textOutput('bad'),style="color:red"), 
+      textOutput('defPercentage')
     )
   )
 ))
